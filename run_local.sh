@@ -3,11 +3,12 @@
 # run_local.sh — Run the SIGINT Sentinel locally for testing
 #
 # Usage:
-#   ./run_local.sh           # Run all 3 components
+#   ./run_local.sh           # Run all components
 #   ./run_local.sh client    # Just test the Nebius API connection
 #   ./run_local.sh agent     # Just run the agent
 #   ./run_local.sh sim       # Just run the simulator
 #   ./run_local.sh dash      # Just run the dashboard
+#   ./run_local.sh web       # Just run the web control panel
 # ============================================================
 
 set -e
@@ -54,9 +55,14 @@ case "$MODE" in
         echo "🖥️  Starting dashboard only..."
         python3 "$SCRIPT_DIR/dashboard.py"
         ;;
+    web)
+        echo ""
+        echo "🌐 Starting web control panel..."
+        python3 "$SCRIPT_DIR/web_server.py"
+        ;;
     all)
         echo ""
-        echo "🚀 Starting all 3 components..."
+        echo "🚀 Starting all components..."
         echo "   Press Ctrl+C to stop everything."
         echo ""
 
@@ -72,19 +78,24 @@ case "$MODE" in
         AGENT_PID=$!
         sleep 2
 
-        # Start dashboard in foreground
-        echo "🖥️  Starting dashboard (foreground)..."
+        # Start dashboard in background
+        echo "🖥️  Starting dashboard..."
         python3 "$SCRIPT_DIR/dashboard.py" &
         DASH_PID=$!
 
+        # Start web control panel in background
+        echo "🌐 Starting web control panel on http://localhost:5000 ..."
+        python3 "$SCRIPT_DIR/web_server.py" &
+        WEB_PID=$!
+
         # Trap Ctrl+C to kill all
-        trap "echo ''; echo 'Shutting down...'; kill $SIM_PID $AGENT_PID $DASH_PID 2>/dev/null; exit 0" INT TERM
+        trap "echo ''; echo 'Shutting down...'; kill $SIM_PID $AGENT_PID $DASH_PID $WEB_PID 2>/dev/null; exit 0" INT TERM
 
         # Wait for any to exit
         wait
         ;;
     *)
-        echo "Usage: $0 {all|client|agent|sim|dash}"
+        echo "Usage: $0 {all|client|agent|sim|dash|web}"
         exit 1
         ;;
 esac

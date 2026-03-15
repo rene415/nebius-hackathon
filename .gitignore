@@ -22,6 +22,7 @@ ENV/
 # Logs
 *.log
 
-# Runtime-generated data files (created by simulator.py and agent.py)
+# Runtime-generated data files (created by simulator.py, agent.py, web_server.py)
 scan_feed.jsonl
 alerts.json
+event_config.json

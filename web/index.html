@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGINT Sentinel — Event Control</title>
+  <meta name="description" content="SIGINT Sentinel event security dashboard — device registration, event map, and live threat alerts.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <!-- ─── Top Bar ─── -->
+  <header id="topbar">
+    <div class="topbar-brand">
+      <span class="shield-icon">&#x1F6E1;</span>
+      <h1>SIGINT <span class="accent">Sentinel</span></h1>
+      <span class="version">v2.0</span>
+    </div>
+    <div class="topbar-status">
+      <span class="status-dot" id="serverDot"></span>
+      <span id="serverStatus">Connecting…</span>
+      <span class="clock" id="clock"></span>
+    </div>
+  </header>
+
+  <!-- ─── Tab Navigation ─── -->
+  <nav id="tabs">
+    <button class="tab active" data-tab="checkin">
+      <span class="tab-icon">📱</span> Device Registration
+    </button>
+    <button class="tab" data-tab="map">
+      <span class="tab-icon">🗺️</span> Event Map Builder
+    </button>
+    <button class="tab" data-tab="alerts">
+      <span class="tab-icon">🚨</span> Live Alerts
+    </button>
+    <button class="tab" data-tab="feed">
+      <span class="tab-icon">📡</span> Scan Feed
+    </button>
+  </nav>
+
+  <!-- ─── Tab Panels ─── -->
+  <main id="content">
+
+    <!-- ══════ TAB 1: Device Registration ══════ -->
+    <section id="panel-checkin" class="panel active">
+      <div class="panel-grid">
+        <!-- Registration Form -->
+        <div class="card glass">
+          <h2>Register Device</h2>
+          <p class="card-subtitle">Connect a device to the SIGINT monitoring network</p>
+          <form id="checkinForm">
+            <div class="form-group">
+              <label for="attendeeName">Name / Alias</label>
+              <input type="text" id="attendeeName" placeholder="e.g. Agent Delta" required autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="ticketId">Ticket / Badge ID</label>
+              <input type="text" id="ticketId" placeholder="e.g. TKT-0042" required autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="deviceType">Device Type</label>
+              <select id="deviceType">
+                <option value="phone">📱 Phone</option>
+                <option value="wearable">⌚ Wearable</option>
+                <option value="laptop">💻 Laptop</option>
+                <option value="other">📟 Other</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary" id="checkinBtn">
+              <span class="btn-text">Register Device</span>
+              <span class="btn-loading" hidden>Registering…</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Registered Devices List -->
+        <div class="card glass">
+          <div class="card-header-row">
+            <h2>Registered Devices</h2>
+            <span class="badge" id="deviceCount">0</span>
+          </div>
+          <div id="deviceList" class="device-list">
+            <p class="empty-state">No devices registered yet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ TAB 2: Event Map Builder ══════ -->
+    <section id="panel-map" class="panel">
+      <div class="map-layout">
+        <!-- Toolbar -->
+        <div class="card glass map-toolbar">
+          <h2>Event Map Builder</h2>
+          <p class="card-subtitle">Click the canvas to place WiFi sensor nodes. Drag to reposition.</p>
+          <div class="tool-group">
+            <button class="btn-secondary active" id="toolNode" data-tool="node">
+              📡 Place Node
+            </button>
+            <button class="btn-secondary" id="toolStage" data-tool="stage">
+              🎤 Place Stage
+            </button>
+            <button class="btn-secondary" id="toolZone" data-tool="zone">
+              🟩 Draw Zone
+            </button>
+            <button class="btn-secondary" id="toolSelect" data-tool="select">
+              🖱️ Select / Move
+            </button>
+          </div>
+          <hr class="divider">
+          <div class="tool-group">
+            <button class="btn-accent" id="saveMapBtn">💾 Save Layout</button>
+            <button class="btn-ghost" id="clearMapBtn">🗑️ Clear All</button>
+          </div>
+          <hr class="divider">
+          <div id="mapItemsList" class="map-items-list">
+            <p class="empty-state">No items placed yet.</p>
+          </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="card glass map-canvas-wrapper">
+          <canvas id="eventCanvas" width="900" height="600"></canvas>
+          <div class="canvas-footer">
+            <span class="canvas-hint">Grid: 30px • Click to place • Drag to move</span>
+            <span id="canvasCoords">X: 0, Y: 0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ TAB 3: Live Alerts ══════ -->
+    <section id="panel-alerts" class="panel">
+      <div class="alerts-header">
+        <h2>Threat Alerts</h2>
+        <div class="alerts-controls">
+          <span class="badge" id="alertCount">0</span>
+          <span class="auto-refresh">Auto-refresh: 2s</span>
+        </div>
+      </div>
+      <div id="alertsContainer" class="alerts-grid">
+        <div class="empty-state-large">
+          <span class="empty-icon">✅</span>
+          <p>No threats detected. System nominal.</p>
+          <p class="empty-hint">Start <code>simulator.py</code> + <code>agent.py</code> to generate alerts.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ TAB 4: Scan Feed ══════ -->
+    <section id="panel-feed" class="panel">
+      <div class="alerts-header">
+        <h2>Live Scan Feed</h2>
+        <div class="alerts-controls">
+          <span class="badge" id="feedCount">0</span>
+          <span class="auto-refresh">Auto-refresh: 2s</span>
+        </div>
+      </div>
+      <div class="card glass">
+        <table id="feedTable" class="data-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>MAC Address</th>
+              <th>Node</th>
+              <th>RSSI (dBm)</th>
+            </tr>
+          </thead>
+          <tbody id="feedBody">
+            <tr><td colspan="4" class="empty-state">No scan data yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── Toast Container ─── -->
+  <div id="toastContainer"></div>
+
+  <!-- ─── Docker Connection Modal ─── -->
+  <div id="serverModal" class="modal" hidden>
+    <div class="modal-backdrop"></div>
+    <div class="modal-content card glass">
+      <h2>🐳 Server Connection</h2>
+      <p>Connect to a SIGINT Sentinel server running in Docker.</p>
+      <div class="form-group">
+        <label for="serverUrl">Server URL</label>
+        <input type="url" id="serverUrl" value="http://localhost:5000" placeholder="http://host:port">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="connectBtn">Connect</button>
+        <button class="btn-ghost" id="closeModalBtn">Use Default</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
