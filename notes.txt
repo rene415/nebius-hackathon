@@ -49,3 +49,16 @@ same as line 45
 free credits
 bit.ly/4cCCNzV - workshop
 bit.ly/4sJhWzF - credits
+
+-------
+ideas
+-rave thief catcher - goal - protect rave participants
+    ->use something like wifi motion to detect people
+    ->heat map for detecting people
+    ->network mac broadcast to see devices
+        ->if multiple phones status change simultaneously or in 
+            a short period of time -> alert security
+    ->use llm to analyze the data and generate a report
+
+    data pts -> wifi motion, heat map, network mac broadcast, llm
+    legal -> disclaimer / app / TBD
