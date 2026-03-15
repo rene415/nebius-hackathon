@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  sigint-sentinel:
+    build: .
+    image: sigint-sentinel:portainer
+    ports:
+      - '5000:5000'
+    environment:
+      - NEBIUS_API_KEY=${NEBIUS_API_KEY-}
+    volumes:
+      - /home/admin_00/nebius-hackathon/sigint:/app
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
