@@ -52,11 +52,21 @@ def random_mac():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  STATIC FILE SERVING
+#  STATIC FILE SERVING + ROLE-BASED PORTALS
 # ══════════════════════════════════════════════════════════════════════════════
 
 @app.route("/")
-def index():
+def portal():
+    """Landing page — role selection."""
+    return send_from_directory(WEB_DIR, "portal.html")
+
+
+@app.route("/guest")
+@app.route("/vendor")
+@app.route("/staff")
+@app.route("/admin")
+def role_view():
+    """Serve the main SPA — JS reads the role from the URL path."""
     return send_from_directory(WEB_DIR, "index.html")
 
 

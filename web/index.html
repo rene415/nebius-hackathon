@@ -9,13 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body>
+<body data-role="admin">
   <!-- ─── Top Bar ─── -->
   <header id="topbar">
     <div class="topbar-brand">
       <span class="shield-icon">&#x1F6E1;</span>
       <h1>SIGINT <span class="accent">Sentinel</span></h1>
       <span class="version">v2.0</span>
+      <span class="role-badge" id="roleBadge">ADMIN</span>
     </div>
     <div class="topbar-status">
       <span class="status-dot" id="serverDot"></span>
@@ -26,16 +27,22 @@
 
   <!-- ─── Tab Navigation ─── -->
   <nav id="tabs">
-    <button class="tab active" data-tab="checkin">
-      <span class="tab-icon">📱</span> Device Registration
+    <button class="tab active" data-tab="checkin" data-roles="guest vendor staff admin">
+      <span class="tab-icon">📱</span> <span class="tab-label" data-guest="Check In" data-vendor="Register Booth" data-staff="Devices" data-admin="Devices">Device Registration</span>
     </button>
-    <button class="tab" data-tab="map">
+    <button class="tab" data-tab="ticket" data-roles="guest">
+      <span class="tab-icon">🎫</span> My Ticket
+    </button>
+    <button class="tab" data-tab="map" data-roles="staff admin">
       <span class="tab-icon">🗺️</span> Event Map Builder
     </button>
-    <button class="tab" data-tab="alerts">
+    <button class="tab" data-tab="stats" data-roles="staff admin">
+      <span class="tab-icon">📊</span> Live Stats
+    </button>
+    <button class="tab" data-tab="alerts" data-roles="staff admin">
       <span class="tab-icon">🚨</span> Live Alerts
     </button>
-    <button class="tab" data-tab="feed">
+    <button class="tab" data-tab="feed" data-roles="staff admin">
       <span class="tab-icon">📡</span> Scan Feed
     </button>
   </nav>
@@ -43,8 +50,8 @@
   <!-- ─── Tab Panels ─── -->
   <main id="content">
 
-    <!-- ══════ TAB 1: Device Registration ══════ -->
-    <section id="panel-checkin" class="panel active">
+    <!-- ══════ TAB: Device Registration ══════ -->
+    <section id="panel-checkin" class="panel active" data-roles="guest vendor staff admin">
       <div class="panel-grid">
         <!-- Registration Form -->
         <div class="card glass">
@@ -75,8 +82,8 @@
           </form>
         </div>
 
-        <!-- Registered Devices List -->
-        <div class="card glass">
+        <!-- Registered Devices List (hidden for guests — they only see their own) -->
+        <div class="card glass" data-roles="vendor staff admin">
           <div class="card-header-row">
             <h2>Registered Devices</h2>
             <span class="badge" id="deviceCount">0</span>
@@ -88,26 +95,81 @@
       </div>
     </section>
 
-    <!-- ══════ TAB 2: Event Map Builder ══════ -->
-    <section id="panel-map" class="panel">
+    <!-- ══════ TAB: My Ticket (Guest Only) ══════ -->
+    <section id="panel-ticket" class="panel" data-roles="guest">
+      <div class="ticket-wrapper">
+        <div class="ticket-card glass" id="ticketCard">
+          <div class="ticket-empty" id="ticketEmpty">
+            <span class="empty-icon">🎫</span>
+            <p>No ticket yet — register your device first!</p>
+          </div>
+          <div class="ticket-content" id="ticketContent" hidden>
+            <div class="ticket-header">
+              <span class="ticket-event-icon">🛡️</span>
+              <div>
+                <h2 class="ticket-event-name">SIGINT Sentinel Event</h2>
+                <p class="ticket-event-date" id="ticketDate">—</p>
+              </div>
+            </div>
+            <hr class="ticket-divider">
+            <div class="ticket-fields">
+              <div class="ticket-field">
+                <span class="ticket-label">NAME</span>
+                <span class="ticket-value" id="ticketName">—</span>
+              </div>
+              <div class="ticket-field">
+                <span class="ticket-label">TICKET ID</span>
+                <span class="ticket-value" id="ticketIdDisplay">—</span>
+              </div>
+              <div class="ticket-field">
+                <span class="ticket-label">DEVICE</span>
+                <span class="ticket-value" id="ticketDevice">—</span>
+              </div>
+              <div class="ticket-field">
+                <span class="ticket-label">STATUS</span>
+                <span class="ticket-value ticket-status-active">✅ ACTIVE</span>
+              </div>
+            </div>
+            <div class="ticket-barcode" id="ticketBarcode">
+              <!-- Generated barcode lines -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════ TAB: Event Map Builder ══════ -->
+    <section id="panel-map" class="panel" data-roles="staff admin">
       <div class="map-layout">
         <!-- Toolbar -->
         <div class="card glass map-toolbar">
           <h2>Event Map Builder</h2>
-          <p class="card-subtitle">Click the canvas to place WiFi sensor nodes. Drag to reposition.</p>
+          <p class="card-subtitle">Click to place items. Drag zones to draw. Select to move.</p>
+          <div class="tool-section-label">Sensors</div>
           <div class="tool-group">
-            <button class="btn-secondary active" id="toolNode" data-tool="node">
-              📡 Place Node
-            </button>
-            <button class="btn-secondary" id="toolStage" data-tool="stage">
-              🎤 Place Stage
-            </button>
-            <button class="btn-secondary" id="toolZone" data-tool="zone">
-              🟩 Draw Zone
-            </button>
-            <button class="btn-secondary" id="toolSelect" data-tool="select">
-              🖱️ Select / Move
-            </button>
+            <button class="btn-secondary active" data-tool="node">📡 WiFi Node</button>
+            <button class="btn-secondary" data-tool="router">🌐 Router</button>
+          </div>
+          <div class="tool-section-label">Venue</div>
+          <div class="tool-group">
+            <button class="btn-secondary" data-tool="stage">🎤 Stage</button>
+            <button class="btn-secondary" data-tool="food">🍔 Food</button>
+            <button class="btn-secondary" data-tool="drink">🍺 Bar</button>
+            <button class="btn-secondary" data-tool="bathroom">🚻 Restroom</button>
+            <button class="btn-secondary" data-tool="medical">🏥 Medical</button>
+            <button class="btn-secondary" data-tool="exit">🚪 Exit</button>
+            <button class="btn-secondary" data-tool="entrance">🚧 Entrance</button>
+            <button class="btn-secondary" data-tool="parking">🅿️ Parking</button>
+            <button class="btn-secondary" data-tool="vip">⭐ VIP Area</button>
+            <button class="btn-secondary" data-tool="info">ℹ️ Info Booth</button>
+          </div>
+          <div class="tool-section-label">Zones</div>
+          <div class="tool-group">
+            <button class="btn-secondary" data-tool="zone">🟩 Draw Zone</button>
+          </div>
+          <div class="tool-section-label">Tools</div>
+          <div class="tool-group">
+            <button class="btn-secondary" data-tool="select">🖱️ Select / Move</button>
           </div>
           <hr class="divider">
           <div class="tool-group">
@@ -124,15 +186,76 @@
         <div class="card glass map-canvas-wrapper">
           <canvas id="eventCanvas" width="900" height="600"></canvas>
           <div class="canvas-footer">
-            <span class="canvas-hint">Grid: 30px • Click to place • Drag to move</span>
+            <span class="canvas-hint">Grid: 30px • Click to place • Drag zones to draw</span>
             <span id="canvasCoords">X: 0, Y: 0</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ══════ TAB 3: Live Alerts ══════ -->
-    <section id="panel-alerts" class="panel">
+    <!-- ══════ TAB: Live Stats (Staff) ══════ -->
+    <section id="panel-stats" class="panel" data-roles="staff admin">
+      <div class="alerts-header">
+        <h2>Live Event Statistics</h2>
+        <div class="alerts-controls">
+          <span class="auto-refresh">Auto-refresh: 2s</span>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card glass">
+          <span class="stat-icon">👥</span>
+          <span class="stat-value" id="statTotalDevices">0</span>
+          <span class="stat-label">Registered Devices</span>
+        </div>
+        <div class="stat-card glass">
+          <span class="stat-icon">📱</span>
+          <span class="stat-value" id="statPhones">0</span>
+          <span class="stat-label">Phones</span>
+        </div>
+        <div class="stat-card glass">
+          <span class="stat-icon">⌚</span>
+          <span class="stat-value" id="statWearables">0</span>
+          <span class="stat-label">Wearables</span>
+        </div>
+        <div class="stat-card glass">
+          <span class="stat-icon">💻</span>
+          <span class="stat-value" id="statLaptops">0</span>
+          <span class="stat-label">Laptops</span>
+        </div>
+        <div class="stat-card glass">
+          <span class="stat-icon">📡</span>
+          <span class="stat-value" id="statActiveFeed">0</span>
+          <span class="stat-label">Scan Events (last 30)</span>
+        </div>
+        <div class="stat-card glass">
+          <span class="stat-icon">🚨</span>
+          <span class="stat-value" id="statActiveAlerts">0</span>
+          <span class="stat-label">Active Alerts</span>
+        </div>
+      </div>
+      <div class="card glass" style="margin-top: 20px;">
+        <div class="card-header-row">
+          <h2>Recent Registrations</h2>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Ticket</th>
+              <th>Device</th>
+              <th>MAC</th>
+              <th>Registered</th>
+            </tr>
+          </thead>
+          <tbody id="statsDeviceBody">
+            <tr><td colspan="5" class="empty-state">No devices registered yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════ TAB: Live Alerts ══════ -->
+    <section id="panel-alerts" class="panel" data-roles="staff admin">
       <div class="alerts-header">
         <h2>Threat Alerts</h2>
         <div class="alerts-controls">
@@ -149,8 +272,8 @@
       </div>
     </section>
 
-    <!-- ══════ TAB 4: Scan Feed ══════ -->
-    <section id="panel-feed" class="panel">
+    <!-- ══════ TAB: Scan Feed ══════ -->
+    <section id="panel-feed" class="panel" data-roles="staff admin">
       <div class="alerts-header">
         <h2>Live Scan Feed</h2>
         <div class="alerts-controls">

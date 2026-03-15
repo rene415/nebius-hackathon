@@ -91,6 +91,28 @@ body {
   border-radius: 4px;
 }
 
+.role-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 3px 10px;
+  border-radius: 10px;
+  letter-spacing: 0.08em;
+  background: rgba(0,229,255,0.15);
+  color: var(--accent-cyan);
+}
+
+.role-guest .role-badge  { background: rgba(0,230,118,0.15); color: var(--accent-green); }
+.role-vendor .role-badge { background: rgba(255,171,0,0.15); color: var(--accent-amber); }
+.role-staff .role-badge  { background: rgba(68,138,255,0.15); color: var(--accent-blue); }
+.role-admin .role-badge  { background: rgba(224,64,251,0.15); color: var(--accent-magenta); }
+
+/* Role-specific accent overrides */
+.role-guest .tab.active  { color: var(--accent-green); border-bottom-color: var(--accent-green); box-shadow: 0 1px 0 var(--accent-green); }
+.role-vendor .tab.active { color: var(--accent-amber); border-bottom-color: var(--accent-amber); box-shadow: 0 1px 0 var(--accent-amber); }
+.role-staff .tab.active  { color: var(--accent-blue); border-bottom-color: var(--accent-blue); box-shadow: 0 1px 0 var(--accent-blue); }
+.role-admin .tab.active  { color: var(--accent-magenta); border-bottom-color: var(--accent-magenta); box-shadow: 0 1px 0 var(--accent-magenta); }
+
 .topbar-status {
   display: flex;
   align-items: center;
@@ -691,3 +713,151 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ─── Ticket Card (Guest) ─── */
+.ticket-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.ticket-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(17,24,39,0.8), rgba(10,14,23,0.9));
+  border: 1px solid var(--glass-border);
+}
+
+.ticket-empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-secondary);
+}
+
+.ticket-content { padding: 28px 24px; }
+
+.ticket-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.ticket-event-icon { font-size: 2.2rem; }
+
+.ticket-event-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.ticket-event-date {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.ticket-divider {
+  border: none;
+  border-top: 1px dashed rgba(255,255,255,0.1);
+  margin: 18px 0;
+}
+
+.ticket-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ticket-field { display: flex; flex-direction: column; }
+
+.ticket-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.ticket-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.ticket-status-active { color: var(--accent-green) !important; }
+
+.ticket-barcode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 24px;
+  padding: 12px 0 4px;
+  border-top: 1px dashed rgba(255,255,255,0.1);
+}
+
+.ticket-barcode .bar {
+  display: inline-block;
+  height: 36px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 1px;
+}
+
+/* ─── Stats Grid (Staff) ─── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  text-align: center;
+  border-radius: var(--radius);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,229,255,0.08);
+}
+
+.stat-icon { font-size: 2rem; margin-bottom: 8px; }
+
+.stat-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Tool Section Labels (Map Builder) ─── */
+.tool-section-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-top: 14px;
+  margin-bottom: 2px;
+}
+
+.tool-section-label:first-of-type { margin-top: 8px; }
+
