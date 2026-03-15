@@ -1,0 +1,51 @@
+10:08am opening/kickoff
+
+ujval kapasi - nvidia - vp of ai, hpc frameworks & libraries
+    team works w/ dynamo
+inference stack
+
+kv cache?? wut iz dat
+    KV cache (Key-Value cache) is an optimization technique in transformer models 
+    that speeds up LLM text generation by storing previously computed keys (K) and 
+    values (V) for tokens in the sequence. Instead of recalculating the entire attention mechanism for every new word, it only computes the new token's data, reducing complexity and preventing slow, redundant computations
+agent swarm
+    -> optimize for throughput
+
+inference stack
+llm - multi modal input
+    -> vision, audio, text, etc
+treedol?
+multi modl generative llm
+autodegressive something
+denoiser - imager - coder?
+dynamo stack, sglang, vllm
+
+forgot to write name + role
+cline - OSS grant - cline.bot/ossgrant or something similar for url
+    -> or visit cline table + talk to guy
+
+stefan webb
+oumi - lead developer relations engineer
+    -> tooling for custom ai model dev
+    track -> ai voice agent that uses small voice language models
+    nebius resource page + hackw/oumi github page
+
+greta ernst
+tavily - web access layer for ai agents
+
+victor su-ortiz - minimax
+    ->  ask for tokens 10$ starting
+
+ty layton - toloka
+    -> ask for tokens
+
+anastasia crew - openrouter, startups + growth dept
+
+judging
+3 min pitch 2 min question
+top 6 teams present
+same as line 45
+
+free credits
+bit.ly/4cCCNzV - workshop
+bit.ly/4sJhWzF - credits
