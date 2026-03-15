@@ -190,6 +190,7 @@
           <div class="tool-section-label">Tools</div>
           <div class="tool-group">
             <button class="btn-secondary" data-tool="select">🖱️ Select / Move</button>
+            <button class="btn-secondary" data-tool="delete">❌ Delete</button>
           </div>
           <hr class="divider">
           <div class="tool-group">
@@ -328,28 +329,40 @@
       </div>
       <div class="panel-grid">
         <div class="card glass">
-          <h2>Send Alert to All Staff</h2>
-          <form id="staffAlertForm">
-            <div class="form-group">
-              <label for="staffAlertSender">Your Name</label>
-              <input type="text" id="staffAlertSender" placeholder="e.g. Officer Chen" required autocomplete="off">
+          <div class="form-group" style="margin-bottom:12px">
+            <label for="staffAlertSender">Your Name</label>
+            <input type="text" id="staffAlertSender" placeholder="e.g. Officer Chen" autocomplete="off">
+          </div>
+          <div class="staff-quick-label" style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#5f6368;margin-bottom:8px;font-weight:600">🟢 Normal</div>
+          <div class="staff-quick-btns">
+            <button class="staff-alert-btn normal" data-msg="All clear — no issues" data-prio="normal">✅ All Clear</button>
+            <button class="staff-alert-btn normal" data-msg="Taking break, covering Section" data-prio="normal">☕ Break</button>
+            <button class="staff-alert-btn normal" data-msg="Shift change — new staff on duty" data-prio="normal">🔄 Shift Change</button>
+            <button class="staff-alert-btn normal" data-msg="Equipment check completed" data-prio="normal">🔧 Equip Check</button>
+          </div>
+          <div class="staff-quick-label" style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#5f6368;margin:12px 0 8px;font-weight:600">🟡 Urgent</div>
+          <div class="staff-quick-btns">
+            <button class="staff-alert-btn urgent" data-msg="Suspicious individual spotted" data-prio="urgent">👁️ Suspicious Person</button>
+            <button class="staff-alert-btn urgent" data-msg="Crowd getting dense, monitor closely" data-prio="urgent">👥 Crowd Buildup</button>
+            <button class="staff-alert-btn urgent" data-msg="Medical assistance needed" data-prio="urgent">🏥 Medical Needed</button>
+            <button class="staff-alert-btn urgent" data-msg="Lost child reported" data-prio="urgent">👶 Lost Child</button>
+            <button class="staff-alert-btn urgent" data-msg="Unattended bag/item found" data-prio="urgent">🎒 Unattended Item</button>
+          </div>
+          <div class="staff-quick-label" style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#5f6368;margin:12px 0 8px;font-weight:600">🔴 Critical</div>
+          <div class="staff-quick-btns">
+            <button class="staff-alert-btn critical" data-msg="EMERGENCY — Evacuate area immediately" data-prio="critical">🚨 Evacuate</button>
+            <button class="staff-alert-btn critical" data-msg="Fight/altercation in progress" data-prio="critical">⚠️ Altercation</button>
+            <button class="staff-alert-btn critical" data-msg="Theft in progress — all units respond" data-prio="critical">🚨 Theft Alert</button>
+            <button class="staff-alert-btn critical" data-msg="Perimeter breach detected" data-prio="critical">🚫 Perimeter Breach</button>
+          </div>
+          <hr class="divider">
+          <div class="form-group" style="margin-top:12px">
+            <label for="staffAlertMsg">Custom Message</label>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="staffAlertMsg" placeholder="Type custom alert..." style="flex:1">
+              <button class="btn-accent" id="staffCustomBtn" style="white-space:nowrap">📢 Send</button>
             </div>
-            <div class="form-group">
-              <label for="staffAlertMsg">Message</label>
-              <textarea id="staffAlertMsg" rows="3" placeholder="e.g. Suspicious group near Exit B" required
-                style="width:100%;padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8eaed;font-family:'Inter',sans-serif;font-size:0.9rem;resize:vertical;"></textarea>
-            </div>
-            <div class="form-group">
-              <label for="staffAlertPriority">Priority</label>
-              <select id="staffAlertPriority"
-                style="width:100%;padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8eaed;font-family:'JetBrains Mono',monospace;font-size:0.9rem;">
-                <option value="normal">🟢 Normal</option>
-                <option value="urgent">🟡 Urgent</option>
-                <option value="critical">🔴 Critical</option>
-              </select>
-            </div>
-            <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,#ff1744,#e040fb);">📢 Broadcast Alert</button>
-          </form>
+          </div>
         </div>
         <div class="card glass">
           <div class="card-header-row">

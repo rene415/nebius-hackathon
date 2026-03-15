@@ -347,11 +347,23 @@
       });
     });
 
-    // Mouse down — start zone draw or start drag
+    // Mouse down — start zone draw, delete, or start drag
     canvas.addEventListener('mousedown', (e) => {
       const { mx, my } = getCanvasCoords(e, canvas);
 
-      if (state.activeTool === 'zone') {
+      // Delete mode — click to remove
+      if (state.activeTool === 'delete') {
+        for (let i = state.mapItems.length - 1; i >= 0; i--) {
+          if (hitTest(mx, my, state.mapItems[i])) {
+            const removed = state.mapItems.splice(i, 1)[0];
+            toast(`Deleted ${removed.label}`, 'info');
+            drawCanvas(ctx, canvas);
+            renderMapItems();
+            return;
+          }
+        }
+        return;
+      }
         state.drawingZone = true;
         state.zoneStart = { x: mx, y: my };
         state.zoneCurrent = { x: mx, y: my };
@@ -402,7 +414,36 @@
         state.dragging.y = snap(my - state.dragOffset.y);
         drawCanvas(ctx, canvas);
         renderMapItems();
-      }
+        // Draw live device locations (from feed data)
+    // Small pulsing dots near nodes where recent detections happened
+    if (state.feed.length > 0) {
+      const nodePositions = {};
+      state.mapItems.filter((i) => i.type === 'node' || i.type === 'router').forEach((n) => {
+        nodePositions[n.label] = { x: n.x, y: n.y };
+      });
+
+      const recentMacs = new Set();
+      state.feed.slice(0, 15).forEach((evt) => {
+        const nodePos = nodePositions[evt.node_id];
+        if (!nodePos || recentMacs.has(evt.mac)) return;
+        recentMacs.add(evt.mac);
+        // Scatter dots around the node
+        const angle = (recentMacs.size * 137.5) * Math.PI / 180;
+        const dist = 20 + (recentMacs.size % 4) * 12;
+        const dx = nodePos.x + Math.cos(angle) * dist;
+        const dy = nodePos.y + Math.sin(angle) * dist;
+        ctx.beginPath();
+        ctx.arc(dx, dy, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,229,255,0.6)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(dx, dy, 8, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,229,255,0.2)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+    }
+  }
     });
 
     // Mouse up — finalize zone or drop drag
@@ -432,12 +473,12 @@
       }
 
       state.dragging = null;
-      canvas.style.cursor = state.activeTool === 'select' ? 'grab' : 'crosshair';
+      canvas.style.cursor = state.activeTool === 'select' ? 'grab' : (state.activeTool === 'delete' ? 'not-allowed' : 'crosshair');
     });
 
     // Click — place non-zone items
     canvas.addEventListener('click', (e) => {
-      if (state.activeTool === 'select' || state.activeTool === 'zone') return;
+      if (state.activeTool === 'select' || state.activeTool === 'zone' || state.activeTool === 'delete') return;
       const { mx, my } = getCanvasCoords(e, canvas);
       const x = snap(mx);
       const y = snap(my);
@@ -726,33 +767,44 @@
   //  STAFF ALERT BROADCAST
   // ════════════════════════════════════════════════════
   function initStaffAlertForm() {
-    const form = $('#staffAlertForm');
-    if (!form) return;
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const payload = {
-        sender: $('#staffAlertSender').value.trim(),
-        message: $('#staffAlertMsg').value.trim(),
-        priority: $('#staffAlertPriority').value,
-      };
-      try {
-        const res = await fetch(`${API_BASE}/api/staff-alerts`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        if (res.ok) {
-          toast('📢 Alert broadcast to all staff!', 'success');
-          $('#staffAlertMsg').value = '';
-          pollStaffAlerts();
-        } else {
-          const data = await res.json();
-          toast(data.error || 'Failed to send', 'error');
-        }
-      } catch {
-        toast('Could not reach server.', 'error');
-      }
+    // Quick-tap buttons
+    $$('.staff-alert-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const sender = ($('#staffAlertSender') && $('#staffAlertSender').value.trim()) || 'Staff';
+        sendStaffAlert(sender, btn.dataset.msg, btn.dataset.prio);
+      });
     });
+
+    // Custom message
+    const customBtn = $('#staffCustomBtn');
+    if (customBtn) {
+      customBtn.addEventListener('click', () => {
+        const sender = ($('#staffAlertSender') && $('#staffAlertSender').value.trim()) || 'Staff';
+        const msg = $('#staffAlertMsg').value.trim();
+        if (!msg) { toast('Enter a message first', 'error'); return; }
+        sendStaffAlert(sender, msg, 'normal');
+        $('#staffAlertMsg').value = '';
+      });
+    }
+  }
+
+  async function sendStaffAlert(sender, message, priority) {
+    try {
+      const res = await fetch(`${API_BASE}/api/staff-alerts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sender, message, priority }),
+      });
+      if (res.ok) {
+        toast(`📢 ${priority.toUpperCase()}: Alert sent!`, 'success');
+        pollStaffAlerts();
+      } else {
+        const data = await res.json();
+        toast(data.error || 'Failed to send', 'error');
+      }
+    } catch {
+      toast('Could not reach server.', 'error');
+    }
   }
 
   async function pollStaffAlerts() {
