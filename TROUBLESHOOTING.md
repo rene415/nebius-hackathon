@@ -214,6 +214,33 @@ Or simply start `simulator.py` first and wait ~3 seconds before starting `agent.
 
 ---
 
+---
+
+## Issue #009 — `agent.py` crashes with UnicodeEncodeError on Windows `[Dev 2 only]`
+
+**Encountered:** 2026-03-15 ~14:39  
+**Status:** ✅ Resolved (fixed in source code)
+
+**Symptom:**
+```
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f916'
+print("\U0001f916 SIGINT Sentinel Agent — Starting")
+```
+
+**Cause:** Same root cause as Issue #004. Windows PowerShell uses cp1252 by default. The 🤖 (U+1F916) robot emoji in `agent.py`'s startup banner cannot be encoded.
+
+**Fix:** Replaced the emoji with an ASCII label in `agent.py` line 114:
+```python
+# Before (crashed):
+print("\U0001f916 SIGINT Sentinel Agent — Starting")
+# After (fixed):
+print("[AGENT] SIGINT Sentinel Agent -- Starting")
+```
+
+**Verification:** Agent started successfully and completed the first LLM cycle, writing 3 CRITICAL alerts to `alerts.json`. ✅
+
+---
+
 <!-- 
   ADD NEW ISSUES BELOW THIS LINE
   Format:

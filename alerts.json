@@ -1,9 +1,0 @@
-[
-  {
-    "threat_level": "CRITICAL",
-    "suspect_macs": ["AA:BB:CC:DD:EE:01", "AA:BB:CC:DD:EE:02"],
-    "nodes_involved": ["Node_A", "Node_C"],
-    "reasoning": "STUB: 2 devices moved in sync across 2 nodes. Replace once Agent is live.",
-    "timestamp": "2026-03-15T13:00:00Z"
-  }
-]
