@@ -27,8 +27,8 @@
 
   <!-- ─── Tab Navigation ─── -->
   <nav id="tabs">
-    <button class="tab active" data-tab="checkin" data-roles="guest vendor staff admin">
-      <span class="tab-icon">📱</span> <span class="tab-label" data-guest="Check In" data-vendor="Register Booth" data-staff="Devices" data-admin="Devices">Device Registration</span>
+    <button class="tab active" data-tab="checkin" data-roles="guest vendor admin">
+      <span class="tab-icon">📱</span> <span data-guest="Find My Ticket" data-vendor="Register" data-admin="Devices">Check In</span>
     </button>
     <button class="tab" data-tab="ticket" data-roles="guest">
       <span class="tab-icon">🎫</span> My Ticket
@@ -39,8 +39,11 @@
     <button class="tab" data-tab="stats" data-roles="staff admin">
       <span class="tab-icon">📊</span> Live Stats
     </button>
+    <button class="tab" data-tab="staff-alerts" data-roles="staff admin">
+      <span class="tab-icon">📢</span> Staff Alerts
+    </button>
     <button class="tab" data-tab="alerts" data-roles="staff admin">
-      <span class="tab-icon">🚨</span> Live Alerts
+      <span class="tab-icon">🚨</span> Threat Alerts
     </button>
     <button class="tab" data-tab="feed" data-roles="staff admin">
       <span class="tab-icon">📡</span> Scan Feed
@@ -50,13 +53,30 @@
   <!-- ─── Tab Panels ─── -->
   <main id="content">
 
-    <!-- ══════ TAB: Device Registration ══════ -->
-    <section id="panel-checkin" class="panel active" data-roles="guest vendor staff admin">
+    <!-- ══════ TAB: Device Check-In / Ticket Lookup ══════ -->
+    <section id="panel-checkin" class="panel active" data-roles="guest vendor admin">
       <div class="panel-grid">
-        <!-- Registration Form -->
-        <div class="card glass">
+        <!-- Guest: Ticket Lookup -->
+        <div class="card glass" data-roles="guest">
+          <h2>🎫 Find Your Ticket</h2>
+          <p class="card-subtitle">Enter your ticket ID to check in</p>
+          <form id="ticketLookupForm">
+            <div class="form-group">
+              <label for="lookupTicketId">Ticket / Badge ID</label>
+              <input type="text" id="lookupTicketId" placeholder="e.g. TKT-1001" required autocomplete="off">
+            </div>
+            <button type="submit" class="btn-primary" id="lookupBtn">
+              <span class="btn-text">Look Up Ticket</span>
+              <span class="btn-loading" hidden>Searching…</span>
+            </button>
+          </form>
+          <div id="lookupResult" style="margin-top:16px"></div>
+        </div>
+
+        <!-- Admin / Vendor: Registration Form -->
+        <div class="card glass" data-roles="vendor admin">
           <h2>Register Device</h2>
-          <p class="card-subtitle">Connect a device to the SIGINT monitoring network</p>
+          <p class="card-subtitle">Connect a new device to the monitoring network</p>
           <form id="checkinForm">
             <div class="form-group">
               <label for="attendeeName">Name / Alias</label>
@@ -82,8 +102,8 @@
           </form>
         </div>
 
-        <!-- Registered Devices List (hidden for guests — they only see their own) -->
-        <div class="card glass" data-roles="vendor staff admin">
+        <!-- Registered Devices List (admin only) -->
+        <div class="card glass" data-roles="admin">
           <div class="card-header-row">
             <h2>Registered Devices</h2>
             <span class="badge" id="deviceCount">0</span>
@@ -254,7 +274,7 @@
       </div>
     </section>
 
-    <!-- ══════ TAB: Live Alerts ══════ -->
+    <!-- ══════ TAB: Threat Alerts ══════ -->
     <section id="panel-alerts" class="panel" data-roles="staff admin">
       <div class="alerts-header">
         <h2>Threat Alerts</h2>
@@ -295,6 +315,51 @@
             <tr><td colspan="4" class="empty-state">No scan data yet.</td></tr>
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- ══════ TAB: Staff Alerts (Broadcast) ══════ -->
+    <section id="panel-staff-alerts" class="panel" data-roles="staff admin">
+      <div class="alerts-header">
+        <h2>📢 Staff Alert Broadcast</h2>
+        <div class="alerts-controls">
+          <span class="auto-refresh">Auto-refresh: 2s</span>
+        </div>
+      </div>
+      <div class="panel-grid">
+        <div class="card glass">
+          <h2>Send Alert to All Staff</h2>
+          <form id="staffAlertForm">
+            <div class="form-group">
+              <label for="staffAlertSender">Your Name</label>
+              <input type="text" id="staffAlertSender" placeholder="e.g. Officer Chen" required autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="staffAlertMsg">Message</label>
+              <textarea id="staffAlertMsg" rows="3" placeholder="e.g. Suspicious group near Exit B" required
+                style="width:100%;padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8eaed;font-family:'Inter',sans-serif;font-size:0.9rem;resize:vertical;"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="staffAlertPriority">Priority</label>
+              <select id="staffAlertPriority"
+                style="width:100%;padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8eaed;font-family:'JetBrains Mono',monospace;font-size:0.9rem;">
+                <option value="normal">🟢 Normal</option>
+                <option value="urgent">🟡 Urgent</option>
+                <option value="critical">🔴 Critical</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary" style="background:linear-gradient(135deg,#ff1744,#e040fb);">📢 Broadcast Alert</button>
+          </form>
+        </div>
+        <div class="card glass">
+          <div class="card-header-row">
+            <h2>Alert History</h2>
+            <span class="badge" id="staffAlertCount">0</span>
+          </div>
+          <div id="staffAlertList" class="device-list">
+            <p class="empty-state">No staff alerts yet.</p>
+          </div>
+        </div>
       </div>
     </section>
 

@@ -53,8 +53,10 @@
     initTabs();
     initClock();
     initCheckinForm();
+    initTicketLookup();
     initMapBuilder();
     initServerModal();
+    initStaffAlertForm();
     startPolling();
     checkServerStatus();
     loadMyTicket();
@@ -132,10 +134,12 @@
   }
 
   // ════════════════════════════════════════════════════
-  //  DEVICE REGISTRATION
+  //  DEVICE REGISTRATION (admin/vendor only)
   // ════════════════════════════════════════════════════
   function initCheckinForm() {
-    $('#checkinForm').addEventListener('submit', async (e) => {
+    const form = $('#checkinForm');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = $('#checkinBtn');
       btn.querySelector('.btn-text').hidden = true;
@@ -157,21 +161,61 @@
         const data = await res.json();
         if (res.ok) {
           toast(`Device registered: ${data.mac}`, 'success');
-
-          // Save ticket for guest view
-          if (state.role === 'guest') {
-            state.myTicket = data;
-            localStorage.setItem('sigint_ticket', JSON.stringify(data));
-            renderTicket();
-          }
-
-          $('#checkinForm').reset();
+          form.reset();
           loadDevices();
         } else {
           toast(data.error || 'Registration failed', 'error');
         }
       } catch {
         toast('Could not reach server.', 'error');
+      } finally {
+        btn.querySelector('.btn-text').hidden = false;
+        btn.querySelector('.btn-loading').hidden = true;
+        btn.disabled = false;
+      }
+    });
+  }
+
+  // ════════════════════════════════════════════════════
+  //  TICKET LOOKUP (guest only)
+  // ════════════════════════════════════════════════════
+  function initTicketLookup() {
+    const form = $('#ticketLookupForm');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = $('#lookupBtn');
+      const result = $('#lookupResult');
+      btn.querySelector('.btn-text').hidden = true;
+      btn.querySelector('.btn-loading').hidden = false;
+      btn.disabled = true;
+
+      const ticketId = $('#lookupTicketId').value.trim();
+
+      try {
+        const res = await fetch(`${API_BASE}/api/ticket/${encodeURIComponent(ticketId)}`);
+        const data = await res.json();
+        if (res.ok) {
+          state.myTicket = data;
+          localStorage.setItem('sigint_ticket', JSON.stringify(data));
+          renderTicket();
+          toast(`Welcome, ${data.name}!`, 'success');
+          result.innerHTML = `
+            <div class="device-item" style="border-left-color:var(--accent-green)">
+              <span class="device-icon">✅</span>
+              <div class="device-info">
+                <div class="device-name">${esc(data.name)}</div>
+                <div class="device-meta">${data.device_type} • Checked in</div>
+              </div>
+              <span class="device-badge">Active</span>
+            </div>
+            <p style="color:var(--text-dim);font-size:0.8rem;margin-top:8px">Go to the <strong>My Ticket</strong> tab to see your event pass.</p>
+          `;
+        } else {
+          result.innerHTML = `<p style="color:var(--accent-red);font-size:0.85rem">❌ ${data.error || 'Not found'}</p>`;
+        }
+      } catch {
+        result.innerHTML = `<p style="color:var(--accent-red);font-size:0.85rem">❌ Could not reach server.</p>`;
       } finally {
         btn.querySelector('.btn-text').hidden = false;
         btn.querySelector('.btn-loading').hidden = true;
@@ -679,11 +723,78 @@
   }
 
   // ════════════════════════════════════════════════════
+  //  STAFF ALERT BROADCAST
+  // ════════════════════════════════════════════════════
+  function initStaffAlertForm() {
+    const form = $('#staffAlertForm');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        sender: $('#staffAlertSender').value.trim(),
+        message: $('#staffAlertMsg').value.trim(),
+        priority: $('#staffAlertPriority').value,
+      };
+      try {
+        const res = await fetch(`${API_BASE}/api/staff-alerts`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          toast('📢 Alert broadcast to all staff!', 'success');
+          $('#staffAlertMsg').value = '';
+          pollStaffAlerts();
+        } else {
+          const data = await res.json();
+          toast(data.error || 'Failed to send', 'error');
+        }
+      } catch {
+        toast('Could not reach server.', 'error');
+      }
+    });
+  }
+
+  async function pollStaffAlerts() {
+    try {
+      const res = await fetch(`${API_BASE}/api/staff-alerts`);
+      const alerts = await res.json();
+      renderStaffAlerts(alerts);
+    } catch { /* silent */ }
+  }
+
+  function renderStaffAlerts(alerts) {
+    const list = $('#staffAlertList');
+    const count = $('#staffAlertCount');
+    if (!list || !count) return;
+    count.textContent = alerts.length;
+
+    if (alerts.length === 0) {
+      list.innerHTML = '<p class="empty-state">No staff alerts yet.</p>';
+      return;
+    }
+
+    const prioColors = { critical: 'var(--accent-red)', urgent: 'var(--accent-amber)', normal: 'var(--accent-blue)' };
+    const prioIcons = { critical: '🔴', urgent: '🟡', normal: '🟢' };
+
+    list.innerHTML = alerts.slice().reverse().map((a) => `
+      <div class="device-item" style="border-left-color:${prioColors[a.priority] || 'var(--accent-blue)'}">
+        <span class="device-icon">${prioIcons[a.priority] || '🟢'}</span>
+        <div class="device-info">
+          <div class="device-name" style="color:${prioColors[a.priority] || 'inherit'}">${esc(a.message)}</div>
+          <div class="device-meta">From: ${esc(a.sender)} • ${(a.timestamp || '').slice(11, 19)}</div>
+        </div>
+        <span class="device-badge" style="background:${prioColors[a.priority] ? prioColors[a.priority].replace(')', ',0.15)').replace('var(', 'rgba(') : 'rgba(68,138,255,0.15)'}; color:${prioColors[a.priority] || 'var(--accent-blue)'}">${a.priority}</span>
+      </div>
+    `).join('');
+  }
+
+  // ════════════════════════════════════════════════════
   //  POLLING
   // ════════════════════════════════════════════════════
   function startPolling() {
-    loadDevices(); pollAlerts(); pollFeed();
-    setInterval(() => { pollAlerts(); pollFeed(); checkServerStatus(); }, POLL_INTERVAL);
+    loadDevices(); pollAlerts(); pollFeed(); pollStaffAlerts();
+    setInterval(() => { pollAlerts(); pollFeed(); pollStaffAlerts(); checkServerStatus(); }, POLL_INTERVAL);
     setInterval(loadDevices, 5000);
   }
 

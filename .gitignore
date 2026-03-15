@@ -26,3 +26,4 @@ ENV/
 scan_feed.jsonl
 alerts.json
 event_config.json
+staff_alerts.json
