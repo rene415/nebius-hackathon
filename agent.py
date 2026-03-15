@@ -111,7 +111,7 @@ def run_cycle():
 
 def main():
     print("=" * 60)
-    print("🤖 SIGINT Sentinel Agent — Starting")
+    print("[AGENT] SIGINT Sentinel Agent -- Starting")
     print(f"   Model: {MODEL}")
     print(f"   Cycle interval: 10 seconds")
     print("=" * 60)
