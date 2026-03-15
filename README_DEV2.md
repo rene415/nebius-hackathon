@@ -7,9 +7,23 @@
 
 ## ⚡ Step 0 — Setup (Do this first, ~5 min)
 
-```bash
-pip install openai rich python-dotenv
+> Pick your OS below. All three paths lead to the same result.
+
+**Windows (PowerShell):**
+```powershell
+& "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" -m pip install -r requirements.txt
 ```
+
+**Linux / ChromeOS (Debian/Ubuntu):**
+```bash
+# If Python isn't installed yet:
+sudo apt update && sudo apt install -y python3 python3-pip
+
+pip3 install -r requirements.txt
+# or: python3 -m pip install -r requirements.txt
+```
+
+> **ChromeOS note:** Enable the Linux environment first: Settings → Advanced → Developers → Linux development environment.
 
 Create a `.env` file in the repo root:
 ```
@@ -31,8 +45,8 @@ Create a stub `alerts.json` so Dev 1's dashboard has something to render while y
 
 Create a static `scan_feed.jsonl` test file so you can develop **without** needing Dev 1's simulator running:
 
-```bash
-# Paste this into PowerShell to create a 10-line test feed
+**Windows (PowerShell):**
+```powershell
 @"
 {"timestamp":"2026-03-15T13:00:00Z","mac":"AA:BB:CC:DD:EE:01","node_id":"Node_A","rssi":-68}
 {"timestamp":"2026-03-15T13:00:01Z","mac":"AA:BB:CC:DD:EE:02","node_id":"Node_A","rssi":-70}
@@ -45,6 +59,22 @@ Create a static `scan_feed.jsonl` test file so you can develop **without** needi
 {"timestamp":"2026-03-15T13:00:14Z","mac":"AA:BB:CC:DD:EE:04","node_id":"Node_C","rssi":-77}
 {"timestamp":"2026-03-15T13:00:15Z","mac":"AA:BB:CC:DD:EE:05","node_id":"Node_C","rssi":-66}
 "@ | Out-File -FilePath scan_feed.jsonl -Encoding utf8
+```
+
+**Linux / ChromeOS (bash):**
+```bash
+cat > scan_feed.jsonl << 'EOF'
+{"timestamp":"2026-03-15T13:00:00Z","mac":"AA:BB:CC:DD:EE:01","node_id":"Node_A","rssi":-68}
+{"timestamp":"2026-03-15T13:00:01Z","mac":"AA:BB:CC:DD:EE:02","node_id":"Node_A","rssi":-70}
+{"timestamp":"2026-03-15T13:00:02Z","mac":"AA:BB:CC:DD:EE:03","node_id":"Node_A","rssi":-65}
+{"timestamp":"2026-03-15T13:00:03Z","mac":"AA:BB:CC:DD:EE:04","node_id":"Node_A","rssi":-72}
+{"timestamp":"2026-03-15T13:00:04Z","mac":"AA:BB:CC:DD:EE:05","node_id":"Node_A","rssi":-69}
+{"timestamp":"2026-03-15T13:00:12Z","mac":"AA:BB:CC:DD:EE:01","node_id":"Node_C","rssi":-74}
+{"timestamp":"2026-03-15T13:00:13Z","mac":"AA:BB:CC:DD:EE:02","node_id":"Node_C","rssi":-71}
+{"timestamp":"2026-03-15T13:00:13Z","mac":"AA:BB:CC:DD:EE:03","node_id":"Node_C","rssi":-68}
+{"timestamp":"2026-03-15T13:00:14Z","mac":"AA:BB:CC:DD:EE:04","node_id":"Node_C","rssi":-77}
+{"timestamp":"2026-03-15T13:00:15Z","mac":"AA:BB:CC:DD:EE:05","node_id":"Node_C","rssi":-66}
+EOF
 ```
 
 This test feed has 5 devices moving in sync — the LLM **should** flag it as CRITICAL. ✅
@@ -68,8 +98,14 @@ full response content to stdout.
 ```
 
 **Run it immediately:**
+
+**Windows:**
+```powershell
+& "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" nebius_client.py
+```
+**Linux / ChromeOS:**
 ```bash
-python nebius_client.py
+python3 nebius_client.py
 ```
 
 Expected output: `OK` or similar. If this fails, **stop and fix it before writing any other code.** ✅
@@ -161,15 +197,28 @@ Overwrite this file completely each cycle. Dev 1's dashboard polls it every 2 se
 
 Run these three terminals simultaneously:
 
-```bash
+**Windows:**
+```powershell
 # Terminal 1
-python simulator.py   # Dev 1's script — just run it, don't touch it
+& "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" simulator.py
 
 # Terminal 2
-python agent.py
+& "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" agent.py
 
 # Terminal 3
-python dashboard.py   # Dev 1's script — just run it, don't touch it
+& "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" dashboard.py
+```
+
+**Linux / ChromeOS:**
+```bash
+# Terminal 1
+python3 simulator.py
+
+# Terminal 2
+python3 agent.py
+
+# Terminal 3
+python3 dashboard.py
 ```
 
 Watch `alerts.json` update every 10 seconds and trigger Dev 1's dashboard. 🎉

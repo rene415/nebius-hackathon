@@ -1,0 +1,39 @@
+we have a team of 2, we are participating in a hackthon using AI, we have 5 hours to create a working prototype 
+
+we have to split idea into 2 parts that each can complete, and we have to present it in 5 minutes. 
+
+this our idea of what we have, we want to use AI to help us with the tasks, so we can use AI to generate code, images, or any other thing that we need.
+
+_________________________
+
+We need to create a docuemntation pages to help us create a plan for each member to complete and split the work evenly. use as much information to provide each user where the end product will combie the parts into one single project at the end.
+The Autonomous SIGINT Sentinel (Track 1: Edge Inference)
+
+1. The Pitch
+An autonomous Signal Intelligence (SIGINT) agent that acts as a virtual security analyst. It ingests a continuous stream of raw Wi-Fi/Bluetooth MAC addresses at event chokepoints, using LLM inference to dynamically spot organized theft rings—like one person walking toward an exit with 15 phones moving at the exact same velocity.
+
+2. The "Non-Chatbot" Interface
+A high-contrast, cyberpunk-style Python terminal dashboard for the Security Operations Center (SOC) using the rich library.
+
+    Top Pane (The Network Tap): A rapid, scrolling feed of raw JSON payloads simulating edge-node intercepts (e.g., Node_Gate_B: {MAC: ..., RSSI: -65, Time: ...}).
+
+    Bottom Pane (The Analyst Brain): The Nebius agent's real-time reasoning logs. When it spots a cluster, the screen flashes red and prints the agent's deduction: [ALERT] 6 distinct MAC addresses maintaining identical spatial proximity and velocity vector toward East Gate. Probability of single carrier (theft): 94%.
+
+3. The Agentic Loop
+
+    Perceive: A Python script feeds the Nebius model a rolling 10-second window of simulated Wi-Fi ping data across various event nodes.
+
+    Retrieve & Reason (The Magic): Instead of writing complex, brittle algorithms to detect clustering, we offload the spatial reasoning to the model. We prompt the model to analyze the data arrays.
+
+        Agentic Reasoning: "MACs A, B, C, D, and E all disappeared from the 'Main Stage' node simultaneously and just appeared at the 'Exit Gate' node simultaneously with identical signal strengths. Five disconnected devices do not move in perfect unison. This is a single person with a Faraday bag or backpack."
+
+    Execute: The model outputs a strict JSON alert payload containing the anomalous MAC addresses, the suspect's current node location, and a threat level. The terminal UI catches this JSON and triggers the visual alarm for the security staff.
+
+4. The "Hackathon MVP" Scope
+
+    What we fake: Everything related to real mobile apps, SSO, and actual networking hardware. We write a simulator.py script that generates realistic JSON logs of festival movement. Most of the data is random background noise (people walking normally). Periodically, the simulator injects a "theft event" (5 MACs moving with perfectly synced timestamps and RSSI values).
+
+    What we engineer: The Agent Pipeline. We write the Python loop that batches these simulator logs and sends them to the Nebius Token Factory model. We spend our time engineering a brilliant system prompt that teaches the model how to act as a security analyst, evaluate signal anomalies, and output strict JSON alerts.
+
+The Hackathon Strategy Play:
+By dropping the mobile apps and SSO, your team can start writing core logic immediately. You demonstrate an incredibly sophisticated use of LLMs: using them for pattern recognition in temporal/spatial data streams rather than just generating text.
